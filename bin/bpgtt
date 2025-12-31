@@ -1,0 +1,197 @@
+#!/bin/sh
+
+BASE="$SDCARD_PATH/Tools/$PLATFORM"
+
+BITPAL_DIR="$BASE/BitPal.pak/BitPal"
+BITPAL_SESSION="$BITPAL_DIR/current_session.txt"
+BITPAL_LAST="$BITPAL_DIR/last_session_duration.txt"
+BITPAL_MISSIONS="$BITPAL_DIR/bitpal_data/active_missions"
+BITPAL_ACTIVE="$BITPAL_DIR/bitpal_data/active_mission.txt"
+GTT_DIR="$BASE/BitPal.pak/gtt"
+GTT_LIST="$GTT_DIR/gtt_list.txt"
+
+usage() {
+    echo "Usage: $0 start|stop ROM_PATH" >&2
+    exit 1
+}
+
+now() {
+    date +%s
+}
+
+clean_name() {
+    basename "$1" \
+    | sed 's/([^)]*)//g' \
+    | sed 's/\.[^.]*$//' \
+    | tr '_' ' ' \
+    | sed 's/^[0-9]\+[)\._ -]\+//'
+}
+
+extract_emu_tag() {
+    path="$1"
+    if [ -f "$path" ]; then
+        path=$(dirname "$path")
+    fi
+
+    emu_tag=$(echo "$path" | sed -n 's/.*(\([^)]*\)).*/\1/p')
+    if [ -n "$emu_tag" ]; then
+        echo "$emu_tag"
+    else
+        echo "UNK"
+    fi
+}
+
+start_session() {
+    echo "Starting session for: $ROM"
+    echo "$ROM|$(now)" > "$BITPAL_SESSION"
+
+    # Track BitPal only if ROM is in an active mission
+    for mission in "$BITPAL_MISSIONS"/mission_*.txt "$BITPAL_ACTIVE"; do
+        if [ ! -f "$mission" ]; then
+            continue
+        fi
+        if [ "$(cut -d'|' -f7 "$mission")" = "$ROM" ]; then
+            echo "Active mission matched: $mission"
+            echo "$ROM|$(now)" > "$BITPAL_SESSION"
+            break
+        fi
+    done
+}
+
+stop_session() {
+    echo "Stopping session for: $ROM"
+    if [ ! -f "$BITPAL_SESSION" ]; then
+        echo "No active session to stop"
+        exit 0
+    fi
+
+    START=$(cut -d'|' -f2 "$BITPAL_SESSION")
+    END=$(now)
+    DURATION=$((END - START))
+    echo "Stopped session. Duration: ${DURATION}s"
+    echo "$DURATION" > "$BITPAL_LAST"
+
+    rm -f "$BITPAL_SESSION"
+
+    update_gtt "$DURATION"
+    update_bitpal "$DURATION"
+}
+
+update_gtt() {
+    DURATION="$1"
+    EMU_TAG=$(extract_emu_tag "$ROM")
+    echo "GTT: $ROM ($EMU_TAG), ${DURATION}s"
+
+    if [ ! -f "$GTT_LIST" ]; then
+        echo "Game Time Tracker|__HEADER__|header" > "$GTT_LIST"
+        echo "Created GTT list"
+    fi
+
+    if grep -q "|$ROM|" "$GTT_LIST"; then
+        echo "Updated existing GTT entry for $ROM"
+        awk -F'|' -v d="$DURATION" -v rom="$ROM" '
+        BEGIN{OFS="|"}
+        NR==1{print; next}
+        $2==rom{
+            # increment play count and add current duration to total
+            $4++
+            $5+=d
+            $8=d
+
+            # recompute time display from new total ($5)
+            total=$5
+            hours=int(total/3600)
+            minutes=int((total%3600)/60)
+            seconds=total%60
+            if (hours>0) td=hours "h " minutes "m"
+            else if (minutes>0) td=minutes "m"
+            else td=seconds "s"
+
+            # rebuild display name: strip old [..] and prepend new
+            name=$1
+            sub(/^\[[^]]*\] /,"",name)
+            $1="[" td "] " name
+            $6=td
+
+            print
+            next
+        }
+        {print}
+        ' "$GTT_LIST" > /tmp/gtt && mv /tmp/gtt "$GTT_LIST"
+    else
+        echo "Added new GTT entry for $ROM"
+        NAME=$(clean_name "$ROM")
+        # H/M/S display like the original script
+        hours=$((DURATION / 3600))
+        minutes=$(((DURATION % 3600) / 60))
+        seconds=$((DURATION % 60))
+        if [ "$hours" -gt 0 ]; then
+            td="${hours}h ${minutes}m"
+        elif [ "$minutes" -gt 0 ]; then
+            td="${minutes}m"
+        else
+            td="${seconds}s"
+        fi
+        echo "[${td}] $NAME|$ROM|$EMU_TAG|1|$DURATION|$td|launch|$DURATION" >> "$GTT_LIST"
+    fi
+
+    header=$(head -n 1 "$GTT_LIST")
+    echo "$header" > "/tmp/gtt_sorted.txt"
+    tail -n +2 "$GTT_LIST" | sort -t'|' -k5,5nr >> "/tmp/gtt_sorted.txt"
+    mv "/tmp/gtt_sorted.txt" "$GTT_LIST"
+}
+
+update_bitpal() {
+    DURATION="$1"
+    echo "BitPal: $ROM, ${DURATION}s"
+
+    for f in "$BITPAL_MISSIONS"/mission_*.txt "$BITPAL_ACTIVE"; do
+        [ -f "$f" ] || continue
+        mission=$(cat "$f")
+        [ "$(echo "$mission" | cut -d'|' -f7)" = "$ROM" ] || continue
+        echo "Found active mission: $f"
+
+        cur=$(echo "$mission" | cut -d'|' -f8 2>/dev/null)
+        cur=${cur:-0}
+        new=$((cur + DURATION))
+        echo "Progress: ${cur}s -> ${new}s"
+
+        awk -F'|' -v n="$new" 'BEGIN{OFS="|"}{$8=n; print}' "$f" > "$f.tmp"
+        mv "$f.tmp" "$f"
+
+        target=$(( $(cut -d'|' -f4 "$f") * 60 ))
+        if [ "$new" -ge "$target" ]; then
+            touch "$f.complete"
+            echo "Mission complete (target ${target}s): $f.complete"
+        else
+            echo "Mission in progress, $((target - new))s remaining"
+        fi
+        echo "$DURATION" > "$BITPAL_LAST"
+        echo "Wrote last duration: $BITPAL_LAST"
+        break
+    done
+}
+
+main() {
+    mkdir -p "$GTT_DIR" "$BITPAL_DIR"
+
+    if [ $# -ne 2 ]; then
+        usage
+    fi
+
+    CMD="$1"
+    ROM="$2"
+
+    if [ ! -f "$ROM" ]; then
+        echo "ROM file not found: $ROM" >&2
+        exit 1
+    fi
+
+    case "$CMD" in
+        start) start_session ;;
+        stop)  stop_session ;;
+        *) usage ;;
+    esac
+}
+
+main "$@"

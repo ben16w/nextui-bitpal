@@ -1,0 +1,15 @@
+--- /tmp/bitpal_original/mission_options/cancel_mission.sh
++++ BitPal/mission_options/cancel_mission.sh
+@@ -131,9 +131,9 @@
+     if [ $? -eq 0 ]; then
+         # Restore GameSwitcher setting for the mission's game
+         rom_path=$(echo "$mission" | cut -d'|' -f7)
+-        if [ -n "$rom_path" ] && [ -f "$rom_path" ]; then
+-            restore_game_switcher "$rom_path"
+-        fi
++        # if [ -n "$rom_path" ] && [ -f "$rom_path" ]; then
++        #     restore_game_switcher "$rom_path"
++        # fi
+         
+         # Update mood to sad or angry (70% sad, 30% angry)
+         if [ $((RANDOM % 100)) -lt 70 ]; then

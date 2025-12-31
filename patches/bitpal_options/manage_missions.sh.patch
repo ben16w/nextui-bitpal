@@ -1,0 +1,37 @@
+--- /tmp/bitpal_original/bitpal_options/manage_missions.sh
++++ BitPal/bitpal_options/manage_missions.sh
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/usr/bin/env bash
+ MENU="${MENU:-bitpal_menu.txt}"
+ BITPAL_DIR="${BITPAL_DIR:-./bitpal_data}"
+ BITPAL_DATA="${BITPAL_DATA:-$BITPAL_DIR/bitpal_data.txt}"
+@@ -44,9 +44,9 @@
+     xp_reward=$(echo "$mission" | cut -d'|' -f5)
+     complete_time=$(date +%s)
+     rom_path=$(echo "$mission" | cut -d'|' -f7)
+-    if [ -n "$rom_path" ] && [ -f "$rom_path" ]; then
+-        restore_game_switcher "$rom_path"
+-    fi
++    # if [ -n "$rom_path" ] && [ -f "$rom_path" ]; then
++    #     restore_game_switcher "$rom_path"
++    # fi
+     original_level="$level"
+     echo "$desc|$start_time|$complete_time|$xp_reward" >> "$COMPLETED_FILE"
+     . "$BITPAL_DATA"
+@@ -113,6 +113,7 @@
+     selected_mission=$(echo "$mission_choice" | cut -d'|' -f2)
+     if [ -f "$selected_mission" ]; then
+         rom_path=$(cat "$selected_mission" | cut -d'|' -f7)
++        "$SDCARD_PATH"/Tools/tg5040/BitPal.pak/bin/bpgtt start "$rom_path"
+         if echo "$rom_path" | grep -qi "\.sh$"; then
+             PORTS_LAUNCH="/mnt/SDCARD/Emus/$PLATFORM/PORTS.pak/launch.sh"
+             "$PORTS_LAUNCH" "$rom_path"
+@@ -120,6 +121,7 @@
+             export ACTIVE_MISSION="$selected_mission"
+             ./bitpal_options/view_mission.sh
+         fi
++        "$SDCARD_PATH"/Tools/tg5040/BitPal.pak/bin/bpgtt stop "$rom_path"
+     else
+         ./show_message "Mission not found.|It may have been completed or canceled." -l a
+     fi

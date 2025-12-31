@@ -1,0 +1,73 @@
+--- /tmp/bitpal_original/launch.sh
++++ BitPal/launch.sh
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/usr/bin/env bash
+ cd "$(dirname "$0")"
+ export LD_LIBRARY_PATH=/usr/trimui/lib:$LD_LIBRARY_PATH
+ 
+@@ -27,7 +27,7 @@
+ EOF
+ [ ! -f "$COMPLETED_FILE" ] && touch "$COMPLETED_FILE"
+ 
+-SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/current_session.txt"
++SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/BitPal/current_session.txt"
+ if [ -f "$SESSION_FILE" ]; then
+     orphan_data=$(cat "$SESSION_FILE")
+     orphan_rom=$(echo "$orphan_data" | cut -d'|' -f1)
+@@ -132,9 +132,9 @@
+     complete_time=$(date +%s)
+     
+     rom_path=$(echo "$mission" | cut -d'|' -f7)
+-    if [ -n "$rom_path" ] && [ -f "$rom_path" ]; then
+-        restore_game_switcher "$rom_path"
+-    fi
++    # if [ -n "$rom_path" ] && [ -f "$rom_path" ]; then
++    #     restore_game_switcher "$rom_path"
++    # fi
+     
+     original_level="$level"
+     echo "$desc|$start_time|$complete_time|$xp_reward" >> "$COMPLETED_FILE"
+@@ -462,8 +462,8 @@
+     fi
+ }
+ 
+-export SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/current_session.txt"
+-export LAST_SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/last_session_duration.txt"
++export SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/BitPal/current_session.txt"
++export LAST_SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/BitPal/last_session_duration.txt"
+ 
+ load_bitpal_data
+ 
+@@ -614,6 +614,7 @@
+         ROM=$(echo "$picker_output" | cut -d'|' -f2)
+         if [ -f "$ROM" ]; then
+             prepare_resume "$ROM"
++            "$SDCARD_PATH"/Tools/tg5040/BitPal.pak/bin/bpgtt stop "$ROM"
+             if echo "$ROM" | grep -qi "\.sh$"; then
+                 PORTS_LAUNCH="/mnt/SDCARD/Emus/$PLATFORM/PORTS.pak/launch.sh"
+                 if [ -x "$PORTS_LAUNCH" ]; then
+@@ -640,6 +641,7 @@
+                     ./show_message "Emulator not found for $ROM_PLATFORM" -l a
+                 fi
+             fi
++            "$SDCARD_PATH"/Tools/tg5040/BitPal.pak/bin/bpgtt stop "$ROM"
+             SESSION_DURATION=$(cat "$LAST_SESSION_FILE")
+             rm -f "$LAST_SESSION_FILE"
+             mission_found=0
+@@ -687,6 +689,7 @@
+             ROM=$(echo "$picker_output" | cut -d'|' -f2)
+             if [ -f "$ROM" ]; then
+                 prepare_resume "$ROM"
++                "$SDCARD_PATH"/Tools/tg5040/BitPal.pak/bin/bpgtt start "$ROM"
+                 if echo "$ROM" | grep -qi "\.sh$"; then
+                     PORTS_LAUNCH="/mnt/SDCARD/Emus/$PLATFORM/PORTS.pak/launch.sh"
+                     if [ -x "$PORTS_LAUNCH" ]; then
+@@ -713,6 +716,7 @@
+                         ./show_message "Game file not found|$ROM" -l a
+                     fi
+                 fi
++                "$SDCARD_PATH"/Tools/tg5040/BitPal.pak/bin/bpgtt stop "$ROM"
+                 SESSION_DURATION=$(cat "$LAST_SESSION_FILE")
+                 rm -f "$LAST_SESSION_FILE"
+                 mission_found=0

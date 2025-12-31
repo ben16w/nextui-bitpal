@@ -1,0 +1,50 @@
+--- /tmp/bitpal_original/bitpal_options/start_mission.sh
++++ BitPal/bitpal_options/start_mission.sh
+@@ -1,10 +1,10 @@
+-#!/bin/sh
++#!/usr/bin/env bash
+ MENU="${MENU:-bitpal_menu.txt}"
+ BITPAL_DIR="${BITPAL_DIR:-./bitpal_data}"
+ BITPAL_DATA="${BITPAL_DATA:-$BITPAL_DIR/bitpal_data.txt}"
+ ACTIVE_MISSIONS_DIR="${ACTIVE_MISSIONS_DIR:-$BITPAL_DIR/active_missions}"
+ COMPLETED_FILE="${COMPLETED_FILE:-$BITPAL_DIR/completed.txt}"
+-GTT_LIST="${GTT_LIST:-/mnt/SDCARD/Tools/$PLATFORM/Game Time Tracker.pak/gtt_list.txt}"
++GTT_LIST="${GTT_LIST:-/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/gtt/gtt_list.txt}"
+ ROM_DIR="/mnt/SDCARD/Roms"
+ SCRIPT_DIR=$(dirname "$0")
+ mkdir -p "$ACTIVE_MISSIONS_DIR"
+@@ -218,9 +218,9 @@
+     xp_reward=$(echo "$mission" | cut -d'|' -f5)
+     complete_time=$(date +%s)
+     rom_path=$(echo "$mission" | cut -d'|' -f7)
+-    if [ -n "$rom_path" ] && [ -f "$rom_path" ]; then
+-        restore_game_switcher "$rom_path"
+-    fi
++    # if [ -n "$rom_path" ] && [ -f "$rom_path" ]; then
++    #     restore_game_switcher "$rom_path"
++    # fi
+     original_level="$level"
+     echo "$desc|$start_time|$complete_time|$xp_reward" >> "$COMPLETED_FILE"
+     . "$BITPAL_DATA"
+@@ -377,9 +377,10 @@
+          ROM_PLATFORM=$(echo "$ROM_FOLDER_NAME" | sed -n 's/.*(\(.*\)).*/\1/p')
+          [ -z "$ROM_PLATFORM" ] && { CURRENT_PATH=$(dirname "$CURRENT_PATH"); ROM_FOLDER_NAME=$(basename "$CURRENT_PATH"); }
+     done
+-    disable_game_switcher "$rom_path" "$ROM_PLATFORM"
+-    export SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/current_session.txt"
+-    export LAST_SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/last_session_duration.txt"
++    #disable_game_switcher "$rom_path" "$ROM_PLATFORM"
++    export SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/BitPal/current_session.txt"
++    export LAST_SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/BitPal/last_session_duration.txt"
++    "$SDCARD_PATH"/Tools/tg5040/BitPal.pak/bin/bpgtt start "$rom_path"
+     if echo "$rom_path" | grep -qi "\.sh$"; then
+          PORTS_LAUNCH="/mnt/SDCARD/Emus/$PLATFORM/PORTS.pak/launch.sh"
+          "$PORTS_LAUNCH" "$rom_path"
+@@ -392,6 +393,7 @@
+     else
+          ./show_message "Emulator not found for $ROM_PLATFORM" -l a
+     fi
++    "$SDCARD_PATH"/Tools/tg5040/BitPal.pak/bin/bpgtt stop "$rom_path"
+     SESSION_DURATION=$(cat "$LAST_SESSION_FILE")
+     rm -f "$LAST_SESSION_FILE"
+     mission_file="$ACTIVE_MISSIONS_DIR/mission_$mission_slot.txt"

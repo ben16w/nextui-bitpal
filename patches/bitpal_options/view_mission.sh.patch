@@ -1,0 +1,54 @@
+--- /tmp/bitpal_original/bitpal_options/view_mission.sh
++++ BitPal/bitpal_options/view_mission.sh
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/usr/bin/env bash
+ MENU="${MENU:-bitpal_menu.txt}"
+ BITPAL_DIR="${BITPAL_DIR:-./bitpal_data}"
+ BITPAL_DATA="${BITPAL_DATA:-$BITPAL_DIR/bitpal_data.txt}"
+@@ -106,9 +106,9 @@
+     xp_reward=$(echo "$mission" | cut -d'|' -f5)
+     complete_time=$(date +%s)
+     rom_path=$(echo "$mission" | cut -d'|' -f7)
+-    if [ -n "$rom_path" ] && [ -f "$rom_path" ]; then
+-        restore_game_switcher "$rom_path"
+-    fi
++    # if [ -n "$rom_path" ] && [ -f "$rom_path" ]; then
++    #     restore_game_switcher "$rom_path"
++    # fi
+     original_level="$level"
+     echo "$desc|$start_time|$complete_time|$xp_reward" >> "$COMPLETED_FILE"
+     . "$BITPAL_DATA"
+@@ -194,8 +194,9 @@
+                         [ -z "$ROM_PLATFORM" ] && { CURRENT_PATH=$(dirname "$CURRENT_PATH"); ROM_FOLDER_NAME=$(basename "$CURRENT_PATH"); }
+                     done
+                     prepare_resume "$rom_path"
+-                    export SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/current_session.txt"
+-                    export LAST_SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/last_session_duration.txt"
++                    export SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/BitPal/current_session.txt"
++                    export LAST_SESSION_FILE="/mnt/SDCARD/Tools/$PLATFORM/BitPal.pak/BitPal/last_session_duration.txt"
++                    "$SDCARD_PATH"/Tools/tg5040/BitPal.pak/bin/bpgtt start "$rom_path"
+                     if echo "$rom_path" | grep -qi "\.sh$"; then
+                         PORTS_LAUNCH="/mnt/SDCARD/Emus/$PLATFORM/PORTS.pak/launch.sh"
+                         "$PORTS_LAUNCH" "$rom_path"
+@@ -208,6 +209,7 @@
+                     else
+                         ./show_message "Emulator not found for $ROM_PLATFORM" -l a
+                     fi
++                    "$SDCARD_PATH"/Tools/tg5040/BitPal.pak/bin/bpgtt stop "$rom_path"
+                     SESSION_DURATION=$(cat "$LAST_SESSION_FILE")
+                     rm -f "$LAST_SESSION_FILE"
+                     mission=$(cat "$ACTIVE_MISSION")
+@@ -234,9 +236,9 @@
+             cancel)
+                 ./show_message "$face|Cancel Mission?|$desc|Are you sure you want|to cancel this mission?" -l -a "YES" -b "NO"
+                 if [ $? -eq 0 ]; then
+-                    if [ -n "$rom_path" ] && [ -f "$rom_path" ]; then
+-                        restore_game_switcher "$rom_path"
+-                    fi
++                    # if [ -n "$rom_path" ] && [ -f "$rom_path" ]; then
++                    #     restore_game_switcher "$rom_path"
++                    # fi
+                     if [ $((RANDOM % 100)) -lt 70 ]; then
+                         mood="sad"
+                     else

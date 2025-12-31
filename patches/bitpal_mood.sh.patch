@@ -1,0 +1,8 @@
+--- /tmp/bitpal_original/bitpal_mood.sh
++++ BitPal/bitpal_mood.sh
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/usr/bin/env bash
+ # Simplified BitPal Mood System
+ 
+ # Function to update BitPal's mood

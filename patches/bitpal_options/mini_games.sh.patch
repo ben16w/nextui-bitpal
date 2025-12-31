@@ -1,0 +1,8 @@
+--- /tmp/bitpal_original/bitpal_options/mini_games.sh
++++ BitPal/bitpal_options/mini_games.sh
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/usr/bin/env bash
+ cd "$(dirname "$0")/.."
+ export LD_LIBRARY_PATH=/usr/trimui/lib:$LD_LIBRARY_PATH
+ 
