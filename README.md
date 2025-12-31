@@ -26,7 +26,7 @@ This pak is designed and tested for:
 
 ## Disclaimer
 
-This project vendors BitPal from PakUI and is not officially supported by the PakUI maintainers. Please do not file issues related to this pak with PakUI.
+This project bundles a patched copy of BitPal from PakUI and is not officially supported by the PakUI maintainers. Please do not file issues related to this pak with PakUI.
 
 ## Installation
 
@@ -55,8 +55,8 @@ Note: The `<PLATFORM>` folder name is based on the name of your device. For exam
 
 - A Linux/macOS host is required with `curl`, `jq`, `zip`, `unzip`, `diff`, and `make`.
 - The original BitPal content is vendored from the PakUI release at build time into the local `BitPal` folder.
-- Local changes are maintained as `.patch` files under [patches](patches).
-- The [bpgtt](bin/bpgtt) script is also used to update BitPal data files.
+- Local changes are maintained as `.patch` files in the [patches](patches) directory.
+- The [bpgtt](bin/bpgtt) script is used to update BitPal data files.
 
 ```bash
 # Clean any prior build artifacts
