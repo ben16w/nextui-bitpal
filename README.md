@@ -4,7 +4,7 @@ A NextUI port of the BitPal gaming companion from PakUI that offers missions and
 
 ## Description
 
-A port of BitPal from [PakUI](https://github.com/tenlevels/PakUI) to [NextUI](https://github.com/LoveRetro/NextUI). BitPal was created by [tenlevels](https://github.com/tenlevels) and is a friendly gaming companion that offers missions and tracks your progress as you play through your game library.
+A port of BitPal from [PakUI](https://github.com/tenlevels/PakUI) to [NextUI](https://github.com/LoveRetro/NextUI). BitPal, created by [tenlevels](https://github.com/tenlevels), is a friendly gaming companion that offers missions and tracks your progress as you play through your game library.
 
 This pak packages BitPal as a standalone Tool pak for TrimUI devices running NextUI. At build time, the original BitPal from PakUI is downloaded, and a small set of patches are applied so it works cleanly on NextUI devices.
 
@@ -54,7 +54,7 @@ Note: The `<PLATFORM>` folder name is based on the name of your device. For exam
 ## Development
 
 - A Linux/macOS host is required with `curl`, `jq`, `zip`, `unzip`, `diff`, and `make`.
-- The original BitPal content is vendored from the PakUI release at build time into the local `BitPal` folder.
+- The original BitPal content is copied from the PakUI release at build time into the local `BitPal` folder.
 - Local changes are maintained as `.patch` files in the [patches](patches) directory.
 - The [bpgtt](bin/bpgtt) script is used to update BitPal data files.
 
@@ -90,6 +90,6 @@ make release
 
 PakUI and BitPal are licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](https://creativecommons.org/licenses/by-nc/4.0/). See the original PakUI [LICENSE](https://raw.githubusercontent.com/tenlevels/PakUI/refs/heads/main/LICENSE.txt) file for more details.
 
-Bundled third-party binaries and libraries in [bin](bin) are licensed by their respective projects and distributed according to those licenses.
+Bundled third-party binaries in [bin](bin) are licensed by their respective projects and distributed according to those licenses.
 
 The NextUI BitPal project code is licensed under the [MIT License](https://opensource.org/licenses/MIT). See the project [LICENSE](LICENSE) file for more details.
