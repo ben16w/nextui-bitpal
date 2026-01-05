@@ -8,14 +8,6 @@ A port of BitPal from [PakUI](https://github.com/tenlevels/PakUI) to [NextUI](ht
 
 This pak packages BitPal as a standalone Tool pak for TrimUI devices running NextUI. At build time, the original BitPal from PakUI is downloaded, and a small set of patches are applied so it works cleanly on NextUI devices.
 
-## Features
-
-- Missions and challenges based on your gaming history
-- Game session tracking
-- Experience points and level progression
-- Gaming recommendations
-- Retro-styled interface with changing moods
-
 ## Supported Platforms
 
 This pak is designed and tested for:
