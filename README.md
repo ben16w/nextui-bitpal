@@ -34,7 +34,6 @@ Note: The `<PLATFORM>` folder name is based on the name of your device. For exam
 ## Usage
 
 - From NextUI, open **Tools** and select **BitPal** to launch.
-- Follow on-screen prompts to view missions, track sessions, and explore recommendations.
 
 ## Troubleshooting
 
