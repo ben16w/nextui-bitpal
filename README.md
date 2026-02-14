@@ -23,7 +23,7 @@ This project bundles a patched copy of BitPal from PakUI and is not officially s
 ## Installation
 
 1. Mount your MinUI SD card to your computer.
-2. Download the latest [release](https://github.com/ben16w/nextui-bitpal/releases) from GitHub.
+2. ~~Download the latest [release](https://github.com/ben16w/nextui-bitpal/releases) from GitHub.~~ Currently only a test release can be downloaded from the NextUI discord.
 3. Copy the zip file to the correct platform folder in the "/Tools" folder on the SD card. Please ensure the new zip file name is `BitPal.pak.zip`.
 4. Extract the zip in place, then delete the zip file.
 5. Confirm that there is a `/Tools/<PLATFORM>/BitPal.pak/launch.sh` file on your SD card.
